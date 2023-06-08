@@ -1,0 +1,61 @@
+import { ObjectId } from 'mongodb'
+import { ArgsType, Field, InputType, ObjectType, registerEnumType } from 'type-graphql'
+import { getModelForClass, prop as Prop } from '@typegoose/typegoose'
+
+import { ObjectIdScalar } from '../object-id.scalar'
+import { IsEmail, MinLength, MaxLength } from 'class-validator'
+import PaginatedResponse from './pagination.schema'
+import { BaseModel } from './model.schema'
+
+@ObjectType()
+export class User extends BaseModel {
+
+    @Prop({ required: true })
+    @Field()
+      firstName: string
+    @Prop({ required: true })
+    @Field()
+      lastName: string
+    @Prop({ required: true })
+    @Field()
+      email: string
+    @Prop({ required: true })
+    @Field()
+      password: string
+}
+
+export const UserModel = getModelForClass(User,
+  { schemaOptions: { timestamps: true },
+  })
+
+@InputType()
+export class BaseUserInput {
+  @Field()
+  @MaxLength(30)
+    firstName: string
+  @Field()
+  @MaxLength(30)
+    lastName: string
+  @Field()
+  @MinLength(6)
+    password: string
+}
+@InputType()
+export class CreateUserInput extends BaseUserInput {
+  @Field()
+  @IsEmail()
+    email: string
+}
+
+@ObjectType()
+export class PaginatedUserResponse extends PaginatedResponse(User){}
+
+@ArgsType()
+export class UserLoginArgs {
+  @Field()
+  @IsEmail()
+    email: string
+  @MinLength(6)
+  @Field()
+    password: string
+}
